@@ -188,96 +188,126 @@ export default {
 </script>
 
 <template>
-  <div id="app">
-    <h1>Todo App</h1>
-
-    <div>
-      <input v-model="newTask" @keyup.enter="addTask" placeholder="Enter task description">
-      <button @click="addTask">Add</button>
-    </div>
-
-    <div v-if="todos.length > 0">
-      <h2>Tasks ({{ todos.length }})</h2>
-
-      <div>
-        Sort by:
-        <button @click="sortTodos('created_at')">Date Added</button>
-        <button @click="sortTodos('title')">Title</button>
-        <button @click="sortTodos('completed')">Status</button>
+  <div class="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-gray-800 rounded-2xl border border-gray-700">
+      <div class="border-b border-gray-700 p-6">
+        <h1 class="text-2xl font-medium text-gray-100">Todo App</h1>
       </div>
 
-      <ul>
-        <li v-for="(todo, index) in todos" :key="todo.id" :style="{
-          textDecoration: todo.completed ? 'line-through' : 'none',
-          backgroundColor: todo.completed ? '#f0f0f0' : 'white',
-          opacity: todo.completed ? 0.7 : 1
-        }">
-          <button @click="moveTask(index, -1)" :disabled="index === 0">↑</button>
-          <button @click="moveTask(index, 1)" :disabled="index === todos.length - 1">↓</button>
+      <div class="p-6 border-b border-gray-700">
+        <div class="flex gap-3">
+          <input v-model="newTask" @keyup.enter="addTask" placeholder="Enter task description"
+            class="flex-1 px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-gray-500 focus:border-gray-500">
+          <button @click="addTask"
+            class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-gray-100 font-medium rounded-xl border border-gray-600 transition-colors">
+            Add
+          </button>
+        </div>
+      </div>
 
-          <input type="checkbox" v-model="todo.completed" @change="toggleTask(todo)">
+      <div v-if="todos.length > 0" class="p-6 border-b border-gray-700">
+        <div class="flex items-center gap-4">
+          <span class="text-sm font-medium text-gray-300">Sort by:</span>
+          <div class="flex gap-2">
+            <button @click="sortTodos('created_at')"
+              class="px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 text-gray-200 transition-colors">
+              Date Added
+            </button>
+            <button @click="sortTodos('title')"
+              class="px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 text-gray-200 transition-colors">
+              Title
+            </button>
+            <button @click="sortTodos('completed')"
+              class="px-3 py-2 text-sm bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 text-gray-200 transition-colors">
+              Status
+            </button>
+          </div>
+        </div>
+      </div>
 
-          <span v-if="!todo.editing" @click="startEdit(todo)" style="cursor: pointer; margin: 0 10px;">
-            {{ todo.title }}
-          </span>
+      <div v-if="todos.length > 0" class="p-6">
+        <div class="mb-4">
+          <h2 class="text-lg font-medium text-gray-100">Tasks ({{ todos.length }})</h2>
+        </div>
 
-          <input v-else v-model="todo.editTitle" @keyup.enter="saveEdit(todo)" @keyup.esc="cancelEdit(todo)"
-            @blur="saveEdit(todo)" style="margin: 0 10px;" ref="editInput">
+        <div class="space-y-3">
+          <div v-for="(todo, index) in todos" :key="todo.id" :class="[
+            'flex items-center gap-4 p-4 border rounded-xl transition-colors',
+            todo.completed
+              ? 'bg-gray-800 border-gray-700'
+              : 'bg-gray-700 border-gray-600 hover:border-gray-500'
+          ]">
+            <div class="flex flex-col gap-1">
+              <button @click="moveTask(index, -1)" :disabled="index === 0" :class="[
+                'w-6 h-6 flex items-center justify-center text-xs border rounded-md',
+                index === 0
+                  ? 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed'
+                  : 'bg-gray-600 text-gray-200 border-gray-500 hover:bg-gray-500'
+              ]">
+                ↑
+              </button>
+              <button @click="moveTask(index, 1)" :disabled="index === todos.length - 1" :class="[
+                'w-6 h-6 flex items-center justify-center text-xs border rounded-md',
+                index === todos.length - 1
+                  ? 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed'
+                  : 'bg-gray-600 text-gray-200 border-gray-500 hover:bg-gray-500'
+              ]">
+                ↓
+              </button>
+            </div>
 
-          <small v-if="todo.description" style="color: gray;">
-            ({{ todo.description }})
-          </small>
+            <div class="flex-shrink-0">
+              <input type="checkbox" v-model="todo.completed" @change="toggleTask(todo)"
+                class="w-5 h-5 rounded border-2 border-gray-500 bg-gray-700 text-blue-500 focus:ring-blue-500 focus:ring-1">
+            </div>
 
-          <button @click="deleteTask(todo.id)" style="margin-left: 10px;">Delete</button>
-        </li>
-      </ul>
-    </div>
+            <div class="flex-1 min-w-0">
+              <div v-if="!todo.editing" @click="startEdit(todo)" :class="[
+                'cursor-pointer py-1',
+                todo.completed ? 'line-through text-gray-400' : 'text-gray-100'
+              ]">
+                {{ todo.title }}
+              </div>
 
-    <div v-else>
-      <p>No tasks yet. Add one above!</p>
-    </div>
+              <input v-else v-model="todo.editTitle" @keyup.enter="saveEdit(todo)" @keyup.esc="cancelEdit(todo)"
+                @blur="saveEdit(todo)"
+                class="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-lg text-gray-100 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400"
+                ref="editInput">
 
-    <div v-if="loading">Loading...</div>
+              <div v-if="todo.description" class="text-sm text-gray-400 mt-1">
+                {{ todo.description }}
+              </div>
+            </div>
 
-    <div v-if="error" style="color: red;">
-      Error: {{ error }}
+            <button @click="deleteTask(todo.id)"
+              class="flex-shrink-0 px-3 py-2 text-sm text-red-400 bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 hover:text-red-300 transition-colors">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="p-12 text-center">
+        <div class="text-gray-500 mb-2">
+          <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+            </path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-200 mb-1">No tasks yet</h3>
+        <p class="text-gray-400">Add your first task above to get started</p>
+      </div>
+
+      <div v-if="loading" class="p-6 text-center border-t border-gray-700">
+        <div class="text-gray-300">Loading...</div>
+      </div>
+
+      <div v-if="error" class="p-6 border-t border-red-800 bg-red-900/20">
+        <div class="text-red-400 text-center">
+          Error: {{ error }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
-
-<style>
-#app {
-  font-family: Arial, sans-serif;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-input[type="text"],
-input[type="checkbox"] {
-  margin: 5px;
-}
-
-button {
-  margin: 2px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  padding: 10px;
-  margin: 5px 0;
-  border: 1px solid #ddd;
-  display: flex;
-  align-items: center;
-}
-
-li span {
-  flex: 1;
-}
-</style>
