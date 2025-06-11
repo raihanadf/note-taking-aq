@@ -16,6 +16,7 @@ app.get('/health', (req, res) => {
 });
 
 async function startServer() {
+  console.log('Starting server, pls pls wait...');
   try {
     await db.sequelize.authenticate();
     console.log('Database connection established successfully.');
